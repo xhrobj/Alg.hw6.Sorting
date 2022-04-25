@@ -118,4 +118,100 @@ public struct Sorting<Element: Comparable> {
         
         return xx
     }
+    
+    // https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D0%B2%D1%8B%D0%B1%D0%BE%D1%80%D0%BE%D0%BC
+    
+    public static func _selection0(_ xx: [Element]) -> [Element] {
+        var xx = xx, result = [Element]()
+        while xx.count > 0 {
+            var min = xx[0], minIndex = 0
+            for i in 1..<xx.count {
+                if xx[i] < min {
+                    min = xx[i]
+                    minIndex = i
+                }
+            }
+            result.append(min)
+            xx.remove(at: minIndex)
+        }
+        return result
+    }
+    
+    public static func selection(_ xx: [Element]) -> [Element] {
+        var xx = xx
+        for i in 0..<(xx.count-1) {
+            var min = xx[i], minIndex = i
+            for j in (i + 1)..<xx.count {
+                if xx[j] < min {
+                    min = xx[j]
+                    minIndex = j
+                }
+            }
+            guard i != minIndex else { continue }
+            xx.swapAt(i, minIndex)
+        }
+        return xx
+    }
+    
+    // https://ru.wikipedia.org/wiki/%D0%9F%D0%B8%D1%80%D0%B0%D0%BC%D0%B8%D0%B4%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D1%81%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0
+    
+    public static func heap(_ xx: [Element]) -> [Element] {
+        guard xx.count > 1 else { return xx }
+        var xx = xx
+        buildHeap(&xx)
+        shrinkHeap(&xx)
+        return xx
+    }
+      
+    private static func buildHeap(_ xx: inout [Element]) {
+        for index in 1..<xx.count {
+            var child = index
+            var parent = child.parent
+            while child > 0 && xx[child] > xx[parent] {
+                xx.swapAt(child, parent)
+                child = parent
+                parent = child.parent
+            }
+        }
+    }
+      
+    private static func shrinkHeap(_ xx: inout [Element]) {
+        for index in stride(from: xx.count - 1, to: 0, by: -1) {
+            xx.swapAt(0, index)
+            var parent = 0
+            var leftChild = parent.leftChild
+            var rightChild = parent.rightChild
+            while parent < index {
+                var maxChild = -1
+                if leftChild < index {
+                    maxChild = leftChild
+                } else {
+                    break
+                }
+                if rightChild < index && xx[rightChild] > xx[maxChild] {
+                    maxChild = rightChild
+                }
+                guard xx[maxChild] > xx[parent] else { break }
+
+                xx.swapAt(parent, maxChild)
+                parent = maxChild
+                leftChild = parent.leftChild
+                rightChild = parent.rightChild
+            }
+        }
+    }
+}
+
+private extension Int {
+    var parent: Int {
+        (self - 1) / 2
+    }
+
+    var leftChild: Int {
+        (self * 2) + 1
+    }
+
+    var rightChild: Int {
+        (self * 2) + 2
+    }
 }
