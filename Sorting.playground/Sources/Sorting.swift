@@ -1,5 +1,7 @@
 public struct Sorting<Element: Comparable> {
     
+    // https://ru.wikipedia.org/wiki/Сортировка_пузырьком
+    
     // BUB1. +1 байт. Реализовать алгоритм BubbleSort.
     public static func _buble0(_ xx: [Element]) -> [Element] {
         var xx = xx, count = xx.count
@@ -35,7 +37,7 @@ public struct Sorting<Element: Comparable> {
         return xx
     }
     
-    // NOTE: https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D0%B2%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B0%D0%BC%D0%B8
+    // https://ru.wikipedia.org/wiki/Сортировка_вставками
     
     public static func _insertion0(_ xx: [Element]) -> [Element] {
         guard xx.count > 1 else { return xx }
@@ -90,7 +92,7 @@ public struct Sorting<Element: Comparable> {
     //      если потом все равно нужно сделать N операций сдвига? Разве не быстрее сразу начать двигать, как в INS2?
     //
 
-    // NOTE: https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D0%A8%D0%B5%D0%BB%D0%BB%D0%B0
+    // https://ru.wikipedia.org/wiki/Сортировка_Шелла
     
     // SHS1. +1 байт. Реализовать алгоритм ShellSort.
     public static func shell(_ xx: [Element]) -> [Element] {
@@ -119,7 +121,7 @@ public struct Sorting<Element: Comparable> {
         return xx
     }
     
-    // https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D0%B2%D1%8B%D0%B1%D0%BE%D1%80%D0%BE%D0%BC
+    // https://ru.wikipedia.org/wiki/Сортировка_выбором
     
     public static func _selection0(_ xx: [Element]) -> [Element] {
         var xx = xx, result = [Element]()
@@ -153,7 +155,7 @@ public struct Sorting<Element: Comparable> {
         return xx
     }
     
-    // https://ru.wikipedia.org/wiki/%D0%9F%D0%B8%D1%80%D0%B0%D0%BC%D0%B8%D0%B4%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D1%81%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0
+    // https://ru.wikipedia.org/wiki/Пирамидальная_сортировка
     
     public static func heap(_ xx: [Element]) -> [Element] {
         guard xx.count > 1 else { return xx }
@@ -199,6 +201,81 @@ public struct Sorting<Element: Comparable> {
                 rightChild = parent.rightChild
             }
         }
+    }
+    
+    // https://ru.wikipedia.org/wiki/Быстрая_сортировка
+    
+    // NOTE: вариант из книжки "Грокаем алгоритмы"
+    public static func quick(_ xx: [Element]) -> [Element] {
+        guard xx.count > 1 else { return xx }
+        guard xx.count > 2 else {
+            return xx[0] > xx[1] ? [xx[1], xx[0]] : xx
+        }
+        
+        var xx = xx
+        let pivot = xx.popLast()!
+        var left = [Element](), right = [Element]()
+        
+        for x in xx {
+            if x < pivot {
+                left.append(x)
+            } else {
+                right.append(x)
+            }
+        }
+
+        return quick(left) + [pivot] + quick(right)
+    }
+    
+    public static func quick1(_ xx: [Element]) -> [Element] {
+        guard xx.count > 1 else { return xx }
+        
+        let high = xx.count - 1,  pivot = xx[high]
+        var xx = xx, i = 0
+        for j in 0..<high {
+            if xx[j] <= pivot {
+                xx.swapAt(i, j)
+                i += 1
+            }
+        }
+        xx.swapAt(i, high)
+        
+        return quick1(Array(xx[..<i])) + quick1(Array(xx[i...]))
+    }
+    
+    // https://ru.wikipedia.org/wiki/Сортировка_слиянием
+    
+    public static func merge(_ xx: [Element]) -> [Element] {
+        guard xx.count > 1 else { return xx }
+
+        let (left, right) = (0, xx.count - 1)
+        let mid = (left + right) / 2
+        
+        return _merge(merge(Array(xx[...mid])), merge(Array(xx[(mid + 1)...])))
+    }
+    
+    private static func _merge(_ xx1: [Element], _ xx2: [Element]) -> [Element] {
+        let (m, n) = (xx1.count, xx2.count)
+        var (i, j) = (0, 0)
+        var result = [Element]()
+        while i < m && j < n {
+            if xx1[i] < xx2[j] {
+                result.append(xx1[i])
+                i += 1
+            } else {
+                result.append(xx2[j])
+                j += 1
+            }
+        }
+        while i < m {
+            result.append(xx1[i])
+            i += 1
+        }
+        while j < n {
+            result.append(xx2[j])
+            j += 1
+        }
+        return result
     }
 }
 
